@@ -44,5 +44,3 @@ class Tournament
     end
   end
 end
-
-Dir['./bots/*.rb'].each { |f| require f}
