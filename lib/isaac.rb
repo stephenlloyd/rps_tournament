@@ -7,7 +7,13 @@ class Isaac
   def initialize(name = 'Isaac')
     @name = name
     @my_history = []
-    @my_strategies = { longest_window: 0, repeating_string: 0, frequency: 0, random: 0 }
+    @my_strategies = {
+      shortest_consistent_window: 0,
+      longest_window: 0,
+      repeating_string: 0,
+      frequency: 0,
+      random: 0
+    }
     @last_strategy = nil
   end
 
@@ -32,9 +38,22 @@ class Isaac
       .sample
   end
 
-  def longest_window(history)
-    length, next_moves = (3..10).map { |length| WindowFinder.find_window(history, length) }
+  def shortest_consistent_window(history)
+    _count, next_moves = (3..10).map { |length| WindowFinder.find_window(history, length) }
       .compact
+      .select { |(count, _next_moves)| count > 0 }
+      .select { |(_count, next_moves)| next_moves.uniq.count == 1 }
+      .min_by(&:first)
+
+    return random(history) unless next_moves && next_moves.any?
+
+    next_moves.group_by(&:itself).max_by { |_, ms| ms.count }&.first || random(history)
+  end
+
+  def longest_window(history)
+    _count, next_moves = (3..10).map { |length| WindowFinder.find_window(history, length) }
+      .compact
+      .select { |(count, _next_moves)| count > 0 }
       .max_by(&:first)
 
     return random(history) unless next_moves && next_moves.any?
