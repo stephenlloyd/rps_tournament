@@ -19,7 +19,7 @@ module MuyiwaBot
     scissor_count = opponent_historic_moves.count(:s)
 
     return :draw if rock_count == paper_count && scissor_count < rock_count || rock_count == scissor_count && paper_count <= rock_count || paper_count == scissor_count && rock_count <= paper_count
-    frequency = opponent_historic_moves.inject(Hash.new(0)) do |h, v| 
+    frequency = opponent_historic_moves.inject(Hash.new(0)) do |h, v|
       h[v] += 1;
       h
     end
