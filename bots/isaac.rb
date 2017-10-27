@@ -82,6 +82,7 @@ class Isaac
     return %i[r p s].sample if history.empty?
     counts = history.group_by(&:itself).map { |move, moves| [move, moves.count] }
     predicted = counts.map(&:reverse).max_by(&:first)[1]
+    return random(history) if predicted.nil? || predicted == []
     beat_move(predicted)
   end
 
