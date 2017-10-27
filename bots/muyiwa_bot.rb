@@ -1,7 +1,7 @@
 require 'byebug'
 
-module MuyiwaBot
-  def self.go(opponent_historic_moves)
+class MuyiwaBot
+  def go(opponent_historic_moves)
     return [] if opponent_historic_moves.empty?
 
     # All one value
@@ -13,7 +13,13 @@ module MuyiwaBot
     end
   end
 
-  def self.frequently_analyse(opponent_historic_moves)
+  def name
+    'Muyiwa'
+  end
+
+  private
+
+  def frequently_analyse(opponent_historic_moves)
     rock_count = opponent_historic_moves.count(:r)
     paper_count = opponent_historic_moves.count(:p)
     scissor_count = opponent_historic_moves.count(:s)
@@ -26,7 +32,7 @@ module MuyiwaBot
     most_values = opponent_historic_moves.max_by { |v| frequency[v] }
   end
 
-  def self.decide_winner(value)
+  def decide_winner(value)
     random = [:r, :p, :s].sample
     case value
     when :r
