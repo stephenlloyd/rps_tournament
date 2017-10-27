@@ -8,34 +8,42 @@ class Isaac
     @name = name
     @my_history = []
     @my_strategies = {
-      shortest_consistent_window: 0,
-      longest_window: 0,
-      repeating_string: 0,
-      frequency: 0,
-      random: 0
+      shortest_consistent_window: Array.new(3) { 0 },
+      longest_window: Array.new(3) { 0 },
+      repeating_string: Array.new(3) { 0 },
+      frequency: Array.new(3) { 0 },
+      random: Array.new(3) { 0 }
     }
     @last_strategy = nil
+    @last_bluff_count = nil
   end
 
   def go(their_history)
     check_last_move_outcome(their_history)
-    @last_strategy = choose_strategy(their_history)
+    @last_strategy, @last_bluff_count = choose_strategy(their_history)
 
-    send(last_strategy, their_history).tap do |move|
-      my_history << move
-    end
+    move = send(last_strategy, their_history)
+    last_bluff_count.times { move = apply_bluff(move) }
+    my_history << move
+
+    move
   end
 
   private
 
-  attr_reader :my_history, :my_strategies, :last_strategy
+  attr_reader :my_history, :my_strategies, :last_strategy, :last_bluff_count
 
   def choose_strategy(history)
-    best_win_count = my_strategies.values.max
-    my_strategies
-      .select { |_, count| count == best_win_count }
-      .map(&:first)
-      .sample
+    best_win_count = my_strategies.values.map(&:max).max
+    my_strategies.flat_map do |strategy, counts|
+      counts.each_with_index
+        .select { |count, _| count == best_win_count }
+        .map { |count, bc| [strategy, bc] }
+    end.sample
+  end
+
+  def apply_bluff(move)
+    RPS::RULES.fetch(move)
   end
 
   def shortest_consistent_window(history)
@@ -82,15 +90,15 @@ class Isaac
   end
 
   def check_last_move_outcome(history)
-    return unless last_strategy
+    return unless last_strategy && last_bluff_count
 
     their_last_move = history.last
     my_last_move = my_history.last
     i_win, they_win = RPS.fight(my_last_move, their_last_move)
     if i_win == 1
-      my_strategies[last_strategy] += 1
+      my_strategies[last_strategy][last_bluff_count] += 1
     elsif they_win == 1
-      my_strategies[last_strategy] -= 1
+      my_strategies[last_strategy][last_bluff_count] -= 1
     end
   end
 end
