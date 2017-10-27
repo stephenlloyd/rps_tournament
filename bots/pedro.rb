@@ -20,7 +20,7 @@ class Pedro
       if r_history.empty? or index.nil?
         next
       end
-      return invert r_history[n + index - 1].to_sym
+      return invert r_history[n + index - 1]&.to_sym
     end
     return nil
   end
