@@ -55,7 +55,9 @@ class Isaac
 
     return random(history) unless next_moves && next_moves.any?
 
-    next_moves.group_by(&:itself).max_by { |_, ms| ms.count }&.first || random(history)
+    predicted = next_moves.group_by(&:itself).max_by { |_, ms| ms.count }&.first
+    return random(history) unless predicted
+    beat_move(predicted)
   end
 
   def longest_window(history)
@@ -66,7 +68,9 @@ class Isaac
 
     return random(history) unless next_moves && next_moves.any?
 
-    next_moves.group_by(&:itself).max_by { |_, ms| ms.count }&.first || random(history)
+    predicted = next_moves.group_by(&:itself).max_by { |_, ms| ms.count }&.first
+    return random(history) unless predicted
+    beat_move(predicted)
   end
 
   def repeating_string(history)
@@ -78,7 +82,12 @@ class Isaac
   def frequency(history)
     return %i[r p s].sample if history.empty?
     counts = history.group_by(&:itself).map { |move, moves| [move, moves.count] }
-    counts.map(&:reverse).max_by(&:first)[1]
+    predicted = counts.map(&:reverse).max_by(&:first)[1]
+    beat_move(predicted)
+  end
+
+  def beat_move(move)
+    RPS::RULES.invert.fetch(move)
   end
 
   def random(_history)
