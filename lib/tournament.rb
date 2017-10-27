@@ -4,7 +4,7 @@ class RPS
   RULES = {r: :s, p: :r, s: :p}
   def self.fight(a,b)
     return [0,0] if a == b
-    return [1,0] if RULES[a] == b ? [1,0] : [0, 1]
+    RULES[a] == b ? [1, 0] : [0, 1]
   end
 end
 
